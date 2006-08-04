@@ -13,7 +13,7 @@
 //
 // Original Author:  Adam Everett
 //         Created:  Thu Jul 20 23:15:21 CEST 2006
-// $Id: GLBTrackMatchAnalyzer.cc,v 1.1 2006/07/26 23:58:24 aeverett Exp $
+// $Id: GLBTrackMatchAnalyzer.cc,v 1.2 2006/08/02 21:53:41 aeverett Exp $
 //
 //
 
@@ -186,7 +186,7 @@ GLBTrackMatchAnalyzer::analyze(const edm::Event& event,
     
     if(bestMatch.first){
       std::pair<bool, double> bestChi2 = 
-	theTrackMatcher->match(*staTrack,*bestMatch.second);
+	theTrackMatcher->match(staTrack,bestMatch.second);
       hChi2->Fill(bestChi2.second);
     }
   }  
