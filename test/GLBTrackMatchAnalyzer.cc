@@ -13,7 +13,7 @@
 //
 // Original Author:  Adam Everett
 //         Created:  Thu Jul 20 23:15:21 CEST 2006
-// $Id: GLBTrackMatchAnalyzer.cc,v 1.2 2006/08/02 21:53:41 aeverett Exp $
+// $Id: GLBTrackMatchAnalyzer.cc,v 1.3 2006/08/04 15:02:08 aeverett Exp $
 //
 //
 
@@ -179,16 +179,16 @@ GLBTrackMatchAnalyzer::analyze(const edm::Event& event,
     
     reco::TrackRef staTrack(staTracks,position);
     
-    //LogInfo("GLBTrackMatchAnalyzer")
-    //<<"staTrack "<< staTrack->momentum() <<endl;
-    std::pair<bool, reco::TrackRef> bestMatch = 
-      theTrackMatcher->matchOne(staTrack,tkTracks);
+    ////LogInfo("GLBTrackMatchAnalyzer")
+    ////<<"staTrack "<< staTrack->momentum() <<endl;
+    //std::pair<bool, reco::TrackRef> bestMatch = 
+    //theTrackMatcher->matchOne(staTrack,tkTracks);
     
-    if(bestMatch.first){
-      std::pair<bool, double> bestChi2 = 
-	theTrackMatcher->match(staTrack,bestMatch.second);
-      hChi2->Fill(bestChi2.second);
-    }
+    //if(bestMatch.first){
+    //std::pair<bool, double> bestChi2 = 
+    //theTrackMatcher->match(staTrack,bestMatch.second);
+    //hChi2->Fill(bestChi2.second);
+    //}
   }  
 }
 
