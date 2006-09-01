@@ -13,7 +13,7 @@
 //
 // Original Author:  Adam Everett
 //         Created:  Thu Jul 20 23:15:21 CEST 2006
-// $Id: GLBTrackMatchAnalyzer.cc,v 1.3 2006/08/04 15:02:08 aeverett Exp $
+// $Id: GLBTrackMatchAnalyzer.cc,v 1.4 2006/08/28 19:33:00 aeverett Exp $
 //
 //
 
@@ -162,8 +162,6 @@ GLBTrackMatchAnalyzer::analyze(const edm::Event& event,
   event.getByLabel(theTkTracksLabel, tkTracks);
   
   eventSetup.get<IdealMagneticFieldRecord>().get(theMGField);
-
-  theTrackMatcher->setES(eventSetup);
 
   LogInfo("GLBTrackMatchAnalyzer")
     <<"Reconstructed STAMuon tracks: " 
