@@ -2,8 +2,8 @@
  *  Class: GlobalMuonTrackMatcher
  *
  * 
- *  $Date: 2007/03/15 21:02:00 $
- *  $Revision: 1.42 $
+ *  $Date: 2007/03/16 18:57:05 $
+ *  $Revision: 1.43 $
  *
  *  Authors :
  *  \author Chang Liu  - Purdue University
@@ -252,16 +252,15 @@ GlobalMuonTrackMatcher::convertToTSOS(const TrackCand& staCand,
   TrajectoryStateOnSurface tkTsosFromMu = fromInside(initMuFTS);
   TrajectoryStateOnSurface tkTsosFromTk = fromInside(outerTkTsos);
 
-    
   if( !samePlane(tkTsosFromMu,tkTsosFromTk)) {
     bool same1, same2;
     //propagate tk to same surface as muon
     TrajectoryStateOnSurface newTkTsosFromTk, newTkTsosFromMu;
-    newTkTsosFromTk = theService->propagator(theOutPropagatorName)->propagate(outerTkTsos,tkTsosFromMu.surface());
+    if( tkTsosFromMu.isValid() ) newTkTsosFromTk = theService->propagator(theOutPropagatorName)->propagate(outerTkTsos,tkTsosFromMu.surface());
     same1 =  samePlane(newTkTsosFromTk,tkTsosFromMu);
     LogDebug(category) << "Propagating to same surface (Mu):" << same1;
     if( !same1 ) {
-      TrajectoryStateOnSurface newTkTsosFromMu = theService->propagator(theOutPropagatorName)->propagate(initMuFTS,tkTsosFromTk.surface());
+      if( tkTsosFromTk.isValid() ) newTkTsosFromMu = theService->propagator(theOutPropagatorName)->propagate(initMuFTS,tkTsosFromTk.surface());
       same2 =  samePlane(newTkTsosFromMu,tkTsosFromTk);
       LogDebug(category) << "Propagating to same surface (Tk):" << same2;
     }
@@ -269,7 +268,7 @@ GlobalMuonTrackMatcher::convertToTSOS(const TrackCand& staCand,
     else if(same2) tkTsosFromMu = newTkTsosFromMu;
     else  LogDebug(category) << "Could not propagate Muon and Tracker track to the same tracker bound!";
   }
-  
+ 
 
   return pair<TrajectoryStateOnSurface,TrajectoryStateOnSurface>(tkTsosFromMu, tkTsosFromTk);
 
