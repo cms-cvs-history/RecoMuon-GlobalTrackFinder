@@ -5,15 +5,15 @@
  *   Reconstruct muons starting
  *   from a muon track reconstructed
  *   in the standalone muon system (with DT, CSC and RPC
- *   information).
+ *   information).2
  *   It tries to reconstruct the corresponding
  *   track in the tracker and performs
  *   matching between the reconstructed tracks
  *   in the muon system and the tracker.
  *
  *
- *  $Date: 2007/04/18 14:48:56 $
- *  $Revision: 1.92 $
+ *  $Date: 2007/05/09 21:20:08 $
+ *  $Revision: 1.93.2.3 $
  *
  *  Authors :
  *  N. Neumeister            Purdue University
@@ -82,7 +82,7 @@
 
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "RecoMuon/GlobalMuonProducer/src/GlobalMuonMonitorInterface.h"
-#include "Utilities/Timing/interface/TimerStack.h"
+//#include "TrackingTools/TrackAssociator/interface/TimerStack.h"
 
 #include "TrackingTools/TrajectoryCleaning/interface/TrajectoryCleanerBySharedHits.h"
 
@@ -265,9 +265,9 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::trajectories(cons
   }
 
 
-  TimerStack timers;
-  string timerName = category + "::Total";
-  timers.push(timerName);
+//   TimerStack timers;
+//   string timerName = category + "::Total";
+//   timers.push(timerName);
 
   // cut on muons with low momenta
   if ( (staCandIn).second->pt() < thePtCut || (staCandIn).second->innerMomentum().Rho() < thePtCut || (staCandIn).second->innerMomentum().R() < 2.5 ) return CandidateContainer();
@@ -278,20 +278,20 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::trajectories(cons
   LogTrace(category) << "Adding Traj to STA";
   addTraj(staCand);
 
-  timerName = category + "::makeTkCandCollection";
-  timers.push(timerName);
+//   timerName = category + "::makeTkCandCollection";
+//   timers.push(timerName);
   vector<TrackCand> regionalTkTracks = makeTkCandCollection(staCand);
   LogInfo(category) << "Found " << regionalTkTracks.size() << " tracks within region of interest";  
   if(theMIMFlag && regionalTkTracks.size() > 0) dataMonitor->fill1("cuts",6);  
   // match tracker tracks to muon track
-  timerName = category + "::trackMatcher";
-  timers.pop_and_push(timerName);
+//   timerName = category + "::trackMatcher";
+//   timers.pop_and_push(timerName);
   vector<TrackCand> trackerTracks = theTrackMatcher->match(staCand, regionalTkTracks);
   LogInfo(category) << "Found " << trackerTracks.size() << " matching tracker tracks within region of interest";
   if(theMIMFlag && trackerTracks.size() > 0) dataMonitor->fill1("cuts",7);
   // build a combined tracker-muon MuonCandidate
-  timerName = category + "::build";
-  timers.pop_and_push(timerName);
+//   timerName = category + "::build";
+//   timers.pop_and_push(timerName);
   CandidateContainer result = build(staCand, trackerTracks);
   LogInfo(category) << "Found "<< result.size() << " GLBMuons from one STACand";
 
@@ -309,7 +309,7 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::trajectories(cons
       delete (*is).first;   
     }
   }
-  timers.clear_stack();
+  //  timers.clean_stack();
   return result;
   
 }
@@ -334,14 +334,21 @@ GlobalMuonTrajectoryBuilder::chooseRegionalTrackerTracks(const TrackCand& staCan
 
   vector<TrackCand> result;
 
+  float deltaR = 1.0;
+
   vector<TrackCand>::const_iterator is;
   for ( is = tkTs.begin(); is != tkTs.end(); ++is ) {
     //check if each trackCand is in region of interest
     bool inEtaRange = etaRange.inside(is->second->eta());
     bool inPhiRange = (fabs(Geom::Phi<float>(is->second->phi()) - Geom::Phi<float>(regionOfInterest.direction().phi())) < phiMargin.right() ) ? true : false ;
 
+    double deltaEta = regionOfInterest.direction().eta() - is->second->eta();
+    double deltaPhi = regionOfInterest.direction().phi() - is->second->phi();
+    double deltaR_tmp = sqrt( deltaEta*deltaEta + deltaPhi*deltaPhi );
+
     //for each trackCand in region, add trajectory and add to result
-    if( inEtaRange && inPhiRange ) {
+    //if( inEtaRange && inPhiRange ) {
+    if(deltaR_tmp < deltaR) {
       TrackCand tmpCand = TrackCand(*is);
       addTraj(tmpCand);
       result.push_back(tmpCand);
@@ -1177,17 +1184,17 @@ vector<GlobalMuonTrajectoryBuilder::TrackCand> GlobalMuonTrajectoryBuilder::make
 
 
   const std::string category = "Muon|RecoMuon|GlobalMuonTrajectoryBuilder|makeTkCandCollection";
-  TimerStack times;
-  string timerName = category;
-  times.push(timerName);
+  //  TimerStack times;
+//   string timerName = category;
+//   times.push(timerName);
 
   vector<TrackCand> tkCandColl;
   
   // Tracks not available, make seeds and trajectories
   if ( theMakeTkSeedFlag ) {
 
-    timerName = category + "::muonSeededTracking";
-    times.push(timerName);
+//     timerName = category + "::muonSeededTracking";
+//     times.push(timerName);
 
     LogTrace(category) << "Making Seeds";
 
@@ -1195,8 +1202,8 @@ vector<GlobalMuonTrajectoryBuilder::TrackCand> GlobalMuonTrajectoryBuilder::make
     TC allTkTrajs;
     //if( theMakeTkSeedFlag && staCand.first != 0  && staCand.first->isValid() ) {
     if( theMakeTkSeedFlag ) {
-      timerName = category + "::makeSeeds";
-      times.push(timerName);
+//       timerName = category + "::makeSeeds";
+//       times.push(timerName);
       RectangularEtaPhiTrackingRegion region = defineRegionOfInterest((staCand.second));
       tkSeeds = theTkSeedGenerator->trackerSeeds(staCand,region);
 
@@ -1209,11 +1216,11 @@ vector<GlobalMuonTrajectoryBuilder::TrackCand> GlobalMuonTrajectoryBuilder::make
 	dataMonitor->book2D("seed_sta_pt","Seeds per STA",20,0.,200.,101,-0.5,100.5);
 	dataMonitor->fill2("seed_sta_pt",staCand.second->pt(),tkSeeds.size());
       }
-      timerName = category + "::makeTrajsFromSeed";
-      times.pop_and_push(timerName);
+//       timerName = category + "::makeTrajsFromSeed";
+//       times.pop_and_push(timerName);
 
       allTkTrajs = makeTrajsFromSeeds(tkSeeds);
-      times.pop();
+      //      times.pop();
       
       int position = 0;
       for (TC::const_iterator tt=allTkTrajs.begin();tt!=allTkTrajs.end();++tt){
@@ -1222,7 +1229,7 @@ vector<GlobalMuonTrajectoryBuilder::TrackCand> GlobalMuonTrajectoryBuilder::make
       } 
     }
 
-    times.pop();
+    //    times.pop();
     LogTrace(category) << "Found " << tkCandColl.size() << " tkCands from seeds";
     for(vector<TrackCand>::const_iterator it = tkCandColl.begin();
 	it != tkCandColl.end();++it){
@@ -1242,28 +1249,28 @@ vector<GlobalMuonTrajectoryBuilder::TrackCand> GlobalMuonTrajectoryBuilder::make
 
   } // Tracks are already in edm
   else {
-    timerName = category + "::trackCollection";
-    times.push(timerName);
+//     timerName = category + "::trackCollection";
+//     times.push(timerName);
     vector<TrackCand> tkTrackCands;
     for ( unsigned int position = 0; position != allTrackerTracks->size(); ++position ) {
       reco::TrackRef tkTrackRef(allTrackerTracks,position);
       TrackCand tkCand = TrackCand(0,tkTrackRef);
       if ( theTkTrajsAvailableFlag ) {
-	timerName = category + "::addTrajectory";
-	times.push(timerName);
+// 	timerName = category + "::addTrajectory";
+// 	times.push(timerName);
 	std::vector<Trajectory>::const_iterator it = allTrackerTrajs->begin()+position;
 	const Trajectory* trajRef(&*it);
 	if( trajRef->isValid() ) tkCand.first = trajRef;
-	times.pop();
+	//	times.pop();
       } 
       tkTrackCands.push_back(tkCand);          
     }
-    timerName = category + "::chooseRegionalTrackerTracks";
-    times.push(timerName);
+//     timerName = category + "::chooseRegionalTrackerTracks";
+//     times.push(timerName);
     if(theMIMFlag && tkTrackCands.size() > 0 ) dataMonitor->fill1("cuts",4);
     tkCandColl = chooseRegionalTrackerTracks(staCand,tkTrackCands);
   }
-  times.clear_stack();
+  //  times.clean_stack();
   if(theMIMFlag && tkCandColl.size() > 0) dataMonitor->fill1("cuts",5);
   return tkCandColl;
 
@@ -1275,15 +1282,15 @@ vector<GlobalMuonTrajectoryBuilder::TrackCand> GlobalMuonTrajectoryBuilder::make
 //
 void GlobalMuonTrajectoryBuilder::addTraj(TrackCand& candIn) const {
 
-  TimerStack times;
-  string timerName;
+//   TimerStack times;
+//   string timerName;
 
   const std::string category = "Muon|RecoMuon|GlobalMuonTrajectoryBuilder|addTraj";
-  timerName = category;
-  times.push(timerName);
+//   timerName = category;
+//   times.push(timerName);
   if( candIn.first == 0 ) {
-    timerName = category + "::trackConvert";
-    times.push(timerName);
+//     timerName = category + "::trackConvert";
+//     times.push(timerName);
 
     LogTrace(category) << "Making new trajectory from TrackRef " << (*candIn.second).pt();
 
@@ -1293,7 +1300,7 @@ void GlobalMuonTrajectoryBuilder::addTraj(TrackCand& candIn) const {
     candIn = ( !staTrajs.empty() ) ? TrackCand(new Trajectory(staTrajs.front()),candIn.second) : TrackCand(0,candIn.second);    
 
   }
-  times.clear_stack(); 
+  //  times.clean_stack(); 
 
 }
 
