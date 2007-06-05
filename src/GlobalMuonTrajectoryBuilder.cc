@@ -5,15 +5,15 @@
  *   Reconstruct muons starting
  *   from a muon track reconstructed
  *   in the standalone muon system (with DT, CSC and RPC
- *   information).
+ *   information).2
  *   It tries to reconstruct the corresponding
  *   track in the tracker and performs
  *   matching between the reconstructed tracks
  *   in the muon system and the tracker.
  *
  *
- *  $Date: 2007/05/09 12:35:45 $
- *  $Revision: 1.93.2.2 $
+ *  $Date: 2007/05/09 21:20:08 $
+ *  $Revision: 1.93.2.3 $
  *
  *  Authors :
  *  N. Neumeister            Purdue University
@@ -576,7 +576,7 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
 	rechits.insert(rechits.end(), muonRecHits1.begin(), muonRecHits1.end());
 	if(theMIMFlag) dataMonitor->fill1("build",4);//should equal 3
 	LogTrace(category) << "Number of hits: " << rechits.size();
-	refitted1 = theRefitter->trajectories((*it)->trajectory()->seed(),rechits,innerTsos);
+	refitted1 = theRefitter->trajectory((*it)->trajectory()->seed(),rechits,innerTsos);
 
 	if ( refitted1.size() == 1 ) {
 	  if(theMIMFlag) dataMonitor->fill1("build",5);
@@ -603,7 +603,7 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
 	if(theMIMFlag) dataMonitor->fill1("build",6);
 	LogTrace(category) << "Number of hits: " << rechits.size();
 	
-	refitted2 = theRefitter->trajectories((*it)->trajectory()->seed(),rechits,innerTsos);
+	refitted2 = theRefitter->trajectory((*it)->trajectory()->seed(),rechits,innerTsos);
 	if ( refitted2.size() == 1 ) {
 	  if(theMIMFlag) dataMonitor->fill1("build",7);
 	  refit[2] = &(*refitted2.begin());
@@ -631,7 +631,7 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
 	
 	LogTrace(category) << "Number of hits: " << rechits.size();
 	if(theMIMFlag) dataMonitor->fill1("build",8);
-	refitted3 = theRefitter->trajectories((*it)->trajectory()->seed(),rechits,innerTsos);
+	refitted3 = theRefitter->trajectory((*it)->trajectory()->seed(),rechits,innerTsos);
 	if ( refitted3.size() == 1 ) {
 	  if(theMIMFlag) dataMonitor->fill1("build",9);
 	  refit[3] = &(*refitted3.begin());
