@@ -22,4 +22,9 @@ es_module MuonCkfTrajectoryBuilder = MuonCkfTrajectoryBuilderESProducer
   string updator              = "KFUpdator"
   string estimator            = "Chi2"
 
+	#would skip the first layer to search for measurement if bare TrajectorySeed
+	bool useSeedLayer = false
+	#would rescale the error to find measurements is failing 
+	#1.0 would skip this step completely
+	double rescaleErrorIfFail = 1.0
 }
