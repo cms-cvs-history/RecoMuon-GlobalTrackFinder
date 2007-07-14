@@ -11,7 +11,6 @@ es_module MuonCkfTrajectoryBuilder = MuonCkfTrajectoryBuilderESProducer
 
   # bool   intermediateCleaning = true
   bool   intermediateCleaning = false
-  # ^^^ let's start being conservative ^^^
 
   int32  minimumNumberOfHits  = 5
   bool   alwaysUseInvalidHits = true
@@ -27,4 +26,7 @@ es_module MuonCkfTrajectoryBuilder = MuonCkfTrajectoryBuilderESProducer
 	#would rescale the error to find measurements is failing 
 	#1.0 would skip this step completely
 	double rescaleErrorIfFail = 1.0
+	#propagator used only if useSeedLayer=true
+	string propagatorProximity = "SteppingHelixPropagatorAny"
+
 }
