@@ -161,7 +161,7 @@ limitedCandidates( TempTrajectory& startingTraj,
     }
 
     if (theIntermediateCleaning) IntermediateTrajectoryCleaner::clean(newCand);
-
+    candidates.swap(newCand);
   }
 }
 
