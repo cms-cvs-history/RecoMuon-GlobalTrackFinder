@@ -160,14 +160,8 @@ limitedCandidates( TempTrajectory& startingTraj,
       }
     }
 
-
-    if (theIntermediateCleaning) {
-        candidates.clear();
-        candidates = IntermediateTrajectoryCleaner::clean(newCand);
-    } else {
-        //cout << "calling candidates.swap(newCand) " << endl;
-        candidates.swap(newCand);
-    }
+    if (theIntermediateCleaning) IntermediateTrajectoryCleaner::clean(newCand);
+    candidates.swap(newCand);
   }
 }
 
