@@ -12,8 +12,8 @@
  *   in the muon system and the tracker.
  *
  *
- *  $Date: 2007/07/03 16:43:57 $
- *  $Revision: 1.105 $
+ *  $Date: 2007/08/09 15:52:44 $
+ *  $Revision: 1.105.2.1 $
  *
  *  Authors :
  *  N. Neumeister            Purdue University
@@ -465,7 +465,12 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
       if(theMIMFlag) dataMonitor->fill1("build",2);
       // cut on tracks with low momenta
       const GlobalVector& mom = (*it)->trajectory()->lastMeasurement().updatedState().globalMomentum();
-      if ( mom.mag() < 2.5 || mom.perp() < thePtCut ) continue;
+      if ( mom.mag() < 2.5 || mom.perp() < thePtCut ) {
+             if ( (*it)->trajectory() ) delete (*it)->trajectory();
+             if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
+             if ( *it ) delete (*it);
+	     continue;
+      }
       ConstRecHitContainer trackerRecHits = (*it)->trajectory()->recHits();
       if(theMIMFlag) dataMonitor->fill1("build",3);
 
