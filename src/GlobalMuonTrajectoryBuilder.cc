@@ -12,8 +12,8 @@
  *   in the muon system and the tracker.
  *
  *
- *  $Date: 2007/08/09 15:52:44 $
- *  $Revision: 1.105.2.1 $
+ *  $Date: 2007/08/09 20:11:39 $
+ *  $Revision: 1.105.2.2 $
  *
  *  Authors :
  *  N. Neumeister            Purdue University
@@ -497,6 +497,9 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
       
       if ( !innerTsos.isValid() ) {
          LogTrace(category) << "inner Trajectory State is invalid. ";
+	 if ( (*it)->trajectory() ) delete (*it)->trajectory();
+	 if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
+	 if ( *it ) delete (*it);
          return CandidateContainer();
       }
 
@@ -531,6 +534,12 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
              if ( *it ) delete (*it);
           }
 	}
+	else{
+	  if ( (*it)->trajectory() ) delete (*it)->trajectory();
+	  if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
+	  if ( *it ) delete (*it);
+	}
+
       }
 
       // only first muon hits
