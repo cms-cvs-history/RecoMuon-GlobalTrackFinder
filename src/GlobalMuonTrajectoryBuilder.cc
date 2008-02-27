@@ -12,8 +12,8 @@
  *   in the muon system and the tracker.
  *
  *
- *  $Date: 2007/07/03 16:43:57 $
- *  $Revision: 1.105 $
+ *  $Date:  $
+ *  $Revision:  $
  *
  *  Authors :
  *  N. Neumeister            Purdue University
@@ -465,7 +465,9 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
       if(theMIMFlag) dataMonitor->fill1("build",2);
       // cut on tracks with low momenta
       const GlobalVector& mom = (*it)->trajectory()->lastMeasurement().updatedState().globalMomentum();
-      if ( mom.mag() < 2.5 || mom.perp() < thePtCut ) continue;
+      if ( mom.mag() < 2.5 || mom.perp() < thePtCut ) {
+	     continue;
+      }
       ConstRecHitContainer trackerRecHits = (*it)->trajectory()->recHits();
       if(theMIMFlag) dataMonitor->fill1("build",3);
 
@@ -491,8 +493,8 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
       }      
       
       if ( !innerTsos.isValid() ) {
-         LogTrace(category) << "inner Trajectory State is invalid. ";
-         return CandidateContainer();
+	LogTrace(category) << "inner Trajectory State is invalid. ";
+	continue;
       }
 
       TC refitted1,refitted2,refitted3;
@@ -521,9 +523,6 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
 	      if(refittedTk.size() == 1) refittedTkTraj = refittedTk.front();
 	    }
 	    finalTrajectory = new MuonCandidate(new Trajectory(*refitted1.begin()), (*it)->muonTrack(), (*it)->trackerTrack(), new Trajectory(refittedTkTraj));
-             if ( (*it)->trajectory() ) delete (*it)->trajectory();
-             if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
-             if ( *it ) delete (*it);
           }
 	}
       }
@@ -547,9 +546,6 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
 	      if(refittedTk.size() == 1) refittedTkTraj = refittedTk.front();
 	    }
 	    finalTrajectory = new MuonCandidate(new Trajectory(*refitted2.begin()), (*it)->muonTrack(), (*it)->trackerTrack(), new Trajectory(refittedTkTraj));
-            if ( (*it)->trajectory() ) delete (*it)->trajectory();
-	    if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
-            if ( *it ) delete (*it);
           }
 	}
       } 
@@ -575,25 +571,16 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
 	      if(refittedTk.size() == 1) refittedTkTraj = refittedTk.front();
 	    }
 	    finalTrajectory = new MuonCandidate(new Trajectory(*refitted3.begin()), (*it)->muonTrack(), (*it)->trackerTrack(), new Trajectory(refittedTkTraj));
-            if ( (*it)->trajectory() ) delete (*it)->trajectory();
-	    if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
-            if ( *it ) delete (*it);
           }
 	}
       }
 
       if ( theMuonHitsOption == 4 ) {
 	finalTrajectory = new MuonCandidate(new Trajectory(*chooseTrajectory(refit)), (*it)->muonTrack(), (*it)->trackerTrack(), new Trajectory(*(*it)->trackerTrajectory()));
-        if ( (*it)->trajectory() ) delete (*it)->trajectory();
-	if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
-        if ( *it ) delete (*it);
       } 
 
       if ( theMuonHitsOption == 5 ) {
 	finalTrajectory = new MuonCandidate(new Trajectory(*chooseTrajectoryNew(refit)), (*it)->muonTrack(), (*it)->trackerTrack(), new Trajectory(*(*it)->trackerTrajectory()));
-        if ( (*it)->trajectory() ) delete (*it)->trajectory();
-	if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
-        if ( *it ) delete (*it);
       } 
       
       if ( finalTrajectory ) {
@@ -604,10 +591,20 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
 
   }
   else {
-    refittedResult = tkTrajs;
+    LogTrace(category)<<"theMuonHitsOption="<<theMuonHitsOption<<"\n"
+                      <<tkTrajs.size()<<" total trajectories.";
+    //    do not just copy the collection over. you need to refit it for the smoother to work properly.
+    //    refittedResult = tkTrajs;
+    //loop over them and refit them.
+    for ( CandidateContainer::const_iterator it = tkTrajs.begin(); it != tkTrajs.end(); it++ ) {
+      std::vector<Trajectory> tmp = refitTrajectory((*it)->trackerTrajectory());
+      for (std::vector<Trajectory>::iterator nit = tmp.begin(); nit!=tmp.end(); ++nit){
+        refittedResult.push_back( new MuonCandidate(new Trajectory(*nit),(*it)->muonTrack(),(*it)->trackerTrack(), new Trajectory(*nit)));
+      }
+    }
   }
 
-  //return refittedResult;
+
 
   // Choose the best global fit for this Standalone Muon based on the
   // track probability
@@ -641,6 +638,13 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::build(const Track
     if ( *it ) delete (*it);
   }
   refittedResult.clear();
+  
+  for( CandidateContainer::const_iterator it = tkTrajs.begin(); it != tkTrajs.end(); ++it) {
+    if ( (*it)->trajectory() ) delete (*it)->trajectory();
+    if ( (*it)->trackerTrajectory() ) delete (*it)->trackerTrajectory();
+    if ( *it ) delete (*it);
+  }
+  tkTrajs.clear();  
 
   return selectedResult;
   
