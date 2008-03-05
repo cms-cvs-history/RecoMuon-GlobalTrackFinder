@@ -2,8 +2,8 @@
  *  Class: GlobalMuonTrackMatcher
  *
  * 
- *  $Date: 2008/02/27 02:23:30 $
- *  $Revision: 1.45.4.1 $
+ *  $Date: 2008/02/29 15:54:08 $
+ *  $Revision: 1.45.4.2 $
  *
  *  Authors :
  *  \author Chang Liu  - Purdue University
@@ -179,7 +179,7 @@ GlobalMuonTrackMatcher::convertToTSOSTk(const TrackCand& staCand,
   TrajectoryStateOnSurface impactMuTSOS = muTT.impactPointState();
 
   TrajectoryStateOnSurface outerTkTsos;
-  if(tkCand.first == 0) {
+  if( tkCand.second.isNonnull() ) {
     //make sure the trackerTrack has enough momentum to reach the muon chambers
     if ( !(tkCand.second->p() < theMinP || tkCand.second->pt() < theMinPt )) {
       TrajectoryStateTransform tsTransform;
@@ -188,7 +188,7 @@ GlobalMuonTrackMatcher::convertToTSOSTk(const TrackCand& staCand,
   } else {
     const GlobalVector& mom = tkCand.first->firstMeasurement().updatedState().globalMomentum();
     if(!(mom.mag() < theMinP || mom.perp() < theMinPt)) {
-      outerTkTsos = (tkCand.first->direction() == alongMomentum) ? tkCand.first->lastMeasurement().updatedState() : tkCand.first->firstMeasurement().updatedState();
+      outerTkTsos = tkCand.first->lastMeasurement().updatedState();
     }
   }
   
@@ -246,7 +246,7 @@ GlobalMuonTrackMatcher::convertToTSOSMuHit(const TrackCand& staCand,
   } else {
     const GlobalVector& mom = tkCand.first->lastMeasurement().updatedState().globalMomentum();
     if(!(mom.mag() < theMinP || mom.perp() < theMinPt)) {
-      outerTkTsos = (tkCand.first->direction() == alongMomentum) ? tkCand.first->lastMeasurement().updatedState() : tkCand.first->firstMeasurement().updatedState();
+      outerTkTsos = tkCand.first->lastMeasurement().updatedState();
     }
   }
   
@@ -289,7 +289,7 @@ GlobalMuonTrackMatcher::convertToTSOSTkHit(const TrackCand& staCand,
   } else {
     const GlobalVector& mom = tkCand.first->lastMeasurement().updatedState().globalMomentum();
     if(!(mom.mag() < theMinP || mom.perp() < theMinPt)) {
-      outerTkTsos = (tkCand.first->direction() == alongMomentum) ? tkCand.first->lastMeasurement().updatedState() : tkCand.first->firstMeasurement().updatedState();
+      outerTkTsos = tkCand.first->lastMeasurement().updatedState();
     }
   }
 
