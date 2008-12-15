@@ -12,8 +12,8 @@
  *   in the muon system and the tracker.
  *
  *
- *  $Date: 2007/12/19 16:24:14 $
- *  $Revision: 1.113 $
+ *  $Date: 2008/02/14 20:38:48 $
+ *  $Revision: 1.114 $
  *
  *  Authors :
  *  N. Neumeister            Purdue University
@@ -90,7 +90,7 @@ void GlobalMuonTrajectoryBuilder::setEvent(const edm::Event& event) {
       << "Found " << allTrackerTracks->size() 
       << " tracker Tracks with label "<< theTkTrackLabel;  
   if (event.getByLabel(theTkTrackLabel,handleTrackerTrajs) && event.getByLabel(theTkTrackLabel,tkAssoMap)) {
-    theTkTrajsAvailableFlag = true;
+    theTkTrajsAvailableFlag = false; //aaa
     allTrackerTrajs = &*handleTrackerTrajs;  
     
     if ( theFirstEvent ) {
@@ -113,7 +113,7 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::trajectories(cons
   
   // convert the STA track into a Trajectory if Trajectory not already present
   TrackCand staCand(staCandIn);
-  addTraj(staCand);
+  //addTraj(staCand);
 
   vector<TrackCand> regionalTkTracks = makeTkCandCollection(staCand);
   LogInfo(category) << "Found " << regionalTkTracks.size() << " tracks within region of interest";  
@@ -123,11 +123,11 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::trajectories(cons
   LogInfo(category) << "Found " << trackerTracks.size() << " matching tracker tracks within region of interest";
   if ( trackerTracks.empty() ) {
     if ( staCandIn.first == 0) delete staCand.first;
-    if ( !theTkTrajsAvailableFlag ) {
-        for ( vector<TrackCand>::const_iterator is = regionalTkTracks.begin(); is != regionalTkTracks.end(); ++is) {
-            delete (*is).first;   
-        }
-    }
+    //    if ( !theTkTrajsAvailableFlag ) {
+    //        for ( vector<TrackCand>::const_iterator is = regionalTkTracks.begin(); is != regionalTkTracks.end(); ++is) {
+    //            delete (*is).first;   
+    //        }
+    //    }
     return CandidateContainer();
   }
 
@@ -138,21 +138,23 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::trajectories(cons
   LogInfo(category) << "turn tkMatchedTracks into MuonCandidates";
   CandidateContainer tkTrajs;
   for (vector<TrackCand>::const_iterator tkt = trackerTracks.begin(); tkt != trackerTracks.end(); tkt++) {
-    if ((*tkt).first != 0 && (*tkt).first->isValid()) {
-      MuonCandidate* muonCand = new MuonCandidate( 0 ,staCand.second,(*tkt).second, new Trajectory(*(*tkt).first));
+    //    if ((*tkt).first != 0 && (*tkt).first->isValid()) {
+    //      MuonCandidate* muonCand = new MuonCandidate( 0 ,staCand.second,(*tkt).second, new Trajectory(*(*tkt).first));
+    //      tkTrajs.push_back(muonCand);
+    //      LogTrace(category) << "tpush";
+    //    }
+      MuonCandidate* muonCand = new MuonCandidate( 0 ,staCand.second,(*tkt).second, 0);
       tkTrajs.push_back(muonCand);
-      LogTrace(category) << "tpush";
-    }
   }
 
   if ( tkTrajs.empty() )  {
     LogTrace(category) << "tkTrajs empty";
     if ( staCandIn.first == 0) delete staCand.first;
-    if ( !theTkTrajsAvailableFlag ) {
-        for ( vector<TrackCand>::const_iterator is = regionalTkTracks.begin(); is != regionalTkTracks.end(); ++is) {
-            delete (*is).first;   
-        }
-    }
+    //    if ( !theTkTrajsAvailableFlag ) {
+      //        for ( vector<TrackCand>::const_iterator is = regionalTkTracks.begin(); is != regionalTkTracks.end(); ++is) {
+	  //            delete (*is).first;   
+	    //        }
+	//    }
     return CandidateContainer();
   }
 
@@ -161,11 +163,11 @@ MuonCandidate::CandidateContainer GlobalMuonTrajectoryBuilder::trajectories(cons
 
   // free memory
   if ( staCandIn.first == 0) delete staCand.first;
-  if ( !theTkTrajsAvailableFlag ) {
-    for ( vector<TrackCand>::const_iterator is = regionalTkTracks.begin(); is != regionalTkTracks.end(); ++is) {
-      delete (*is).first;   
-    }
-  }
+  //  if ( !theTkTrajsAvailableFlag ) {
+    //    for ( vector<TrackCand>::const_iterator is = regionalTkTracks.begin(); is != regionalTkTracks.end(); ++is) {
+      //      delete (*is).first;   
+      //    }
+    //  }
 
   for( CandidateContainer::const_iterator it = tkTrajs.begin(); it != tkTrajs.end(); ++it) {
     if ( (*it)->trajectory() ) delete (*it)->trajectory();
