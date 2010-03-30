@@ -4,8 +4,8 @@
 /** \class GlobalMuonTrajectoryBuilder
  *  class to build muon trajectory
  *
- *  $Date: 2010/02/28 20:10:05 $
- *  $Revision: 1.67 $
+ *  $Date: 2010/03/08 15:44:58 $
+ *  $Revision: 1.68 $
  *
  *  \author N. Neumeister 	 Purdue University
  *  \author C. Liu 		 Purdue University
@@ -20,6 +20,7 @@ namespace edm {class ParameterSet; class Event; class EventSetup; }
 
 class MuonServiceProxy;
 class Trajectory;
+class TH1F;
 
 class GlobalMuonTrajectoryBuilder : public GlobalTrajectoryBuilderBase {
 
@@ -48,5 +49,11 @@ class GlobalMuonTrajectoryBuilder : public GlobalTrajectoryBuilderBase {
 
     edm::Handle<reco::TrackCollection> allTrackerTracks;
 
+    bool useTFileService_; 	 
+    
+    TH1F *h_nRegionalTk, *h_nMatchedTk; 	 
+    TH1F *h_nSta, *h_staPt, *h_staRho, *h_staR; 	 
+    TH1F *h_nGlb;
+    
 };
 #endif
